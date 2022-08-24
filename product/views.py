@@ -4,12 +4,16 @@ from rest_framework.decorators import action
 from rating.serializers import ReviewSerializer
 from .import serializers
 from .models import Product
-
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter
 
 
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all()
     permission_classes = [permissions.IsAuthenticatedOrReadOnly,]
+    filter_backends = (DjangoFilterBackend, SearchFilter)
+    filterset_fields = ('category',)
+    search_fields = ('title',)
 
     def get_serializer_class(self):
         if self.action =='list':

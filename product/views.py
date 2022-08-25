@@ -3,12 +3,14 @@ from rest_framework import permissions, response, generics
 from rest_framework.decorators import action 
 from rating.serializers import ReviewSerializer
 from .import serializers
-from .models import Product, Like
+from .models import Product, Like, Favorites
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
 from .import serializers
 from .models import Product, Comment
+from rest_framework.pagination import PageNumberPagination
+
 
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all()
@@ -17,10 +19,24 @@ class ProductViewSet(ModelViewSet):
     filterset_fields = ('category',)
     search_fields = ('title',)
 
+
+class StandartResultsPagination(PageNumberPagination):
+    page_size = 5
+    page_query_param = 'page'
+    max_page_size = 1000
+
+
+class ProductViewSet(ModelViewSet):
+    queryset = Product.objects.all()
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly,]
+    pagination_class = StandartResultsPagination
+
+
     def get_serializer_class(self):
         if self.action =='list':
             return serializers.ProductListSerializer
         return serializers.ProductDetailSerializer
+    
 
     #api/v1/products/<id>/reviews/
     @action(['GET', 'POST'], detail=True)
@@ -42,6 +58,7 @@ class ProductViewSet(ModelViewSet):
             comments = post.related_name.all()
             serializer = serializers.CommentSerializer(comments, many=True)
             return Response(serializers.data, status=200)
+
      #api/v1/posts/<id>/add_to_liked/
     @action(['POST'], detail=True)
     def add_to_liked(self, request, pk):
@@ -68,6 +85,16 @@ class ProductViewSet(ModelViewSet):
         likes = product.likes.all()
         serializer = serializers.LikeSerializer(likes, many=True)
         return Response(serializer.data, status=200)
+
+    @action(['POST'], detail=True)
+    def favorite_action(self, request, pk):
+        post = self.get_object()
+        if request.user.favorites.filter(post=post).exists():
+            request.user.favorites.filter(post=post).delete()
+            return Response('Removed from Favorites', status=204)
+        Favorites.objects.create(post=post, owner=request.user)
+        return Response('Added to favorites!', status=201)
+
 
 class CommentListCreateView(generics.ListCreateAPIView):
     queryset = Comment.objects.all()

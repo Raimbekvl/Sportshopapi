@@ -13,6 +13,7 @@ from .send_mail import send_confirmation_email, send_reset_password
 
 User = get_user_model()
 
+
 class RegistrationView(APIView):
     permission_classes = (permissions.AllowAny,)
     def post(self, request):

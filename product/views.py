@@ -58,6 +58,14 @@ class ProductViewSet(ModelViewSet):
             comments = post.related_name.all()
             serializer = serializers.CommentSerializer(comments, many=True)
             return Response(serializers.data, status=200)
+    @action(['POST'], detail=True)
+    def favorite_action(self, request, pk):
+        product = self.get_object()
+        if request.user.favorites.filter(product=product).exists():
+            request.user.favorites.filter(product=product).delete()
+            return Response('Removed from Favorites', status=204)
+        Favorites.objects.create(product=product, owner=request.user)
+        return Response('Added to favorites!', status=201)
 
      #api/v1/posts/<id>/add_to_liked/
     @action(['POST'], detail=True)
@@ -88,15 +96,14 @@ class ProductViewSet(ModelViewSet):
 
 
 class CommentListCreateView(generics.ListCreateAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = serializers.CommentSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
-    @action(['POST'], detail=True)
-    def favorite_action(self, request, pk):
-        post = self.get_object()
-        if request.user.favorites.filter(post=post).exists():
-            request.user.favorites.filter(post=post).delete()
-            return Response('Removed from Favorites', status=204)
-        Favorites.objects.create(post=post, owner=request.user)
-        return Response('Added to favorites!', status=201)
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+
 
 
 class CommentListCreateView(generics.ListCreateAPIView):

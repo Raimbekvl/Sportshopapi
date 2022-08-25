@@ -26,7 +26,7 @@ class FavoritesSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         repr = super().to_representation(instance)
-        repr['product'] = ProductListSerializer(instance.post).data
+        repr['product'] = ProductListSerializer(instance.product).data
         return repr
     
 class ProductListSerializer(serializers.ModelSerializer):

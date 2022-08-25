@@ -5,17 +5,23 @@ from rest_framework.decorators import action
 from rating.serializers import ReviewSerializer
 from .import serializers
 from .models import Product, Comment
+from rest_framework.pagination import PageNumberPagination
 
 
-
+class StandartResultsPagination(PageNumberPagination):
+    page_size = 5
+    page_query_param = 'page'
+    max_page_size = 1000
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all()
     permission_classes = [permissions.IsAuthenticatedOrReadOnly,]
+    pagination_class = StandartResultsPagination
 
     def get_serializer_class(self):
         if self.action =='list':
             return serializers.ProductListSerializer
         return serializers.ProductDetailSerializer
+    
 
     #api/v1/products/<id>/reviews/
     @action(['GET', 'POST'], detail=True)

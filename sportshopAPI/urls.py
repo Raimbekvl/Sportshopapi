@@ -19,7 +19,7 @@ from rest_framework.routers import SimpleRouter
 from product.views import ProductViewSet
 from django.conf.urls.static import static
 from django.conf import settings
-# from cart.views import CartApiView
+from cart.views import CartApiView
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
@@ -48,8 +48,8 @@ urlpatterns = [
     path('api/v1/', include(router.urls)),
     path('api/v1/account/', include('account.urls')),
     path('api/v1/product/', include('product.urls')),
-    # path('api/v1/cart/', CartApiView.as_view()),
-    # path('api/v1/orders/', include('order.urls'))
+    path('api/v1/cart/', CartApiView.as_view()),
+    path('api/v1/orders/', include('order.urls'))
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

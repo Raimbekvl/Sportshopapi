@@ -1,10 +1,34 @@
 from rest_framework import serializers 
 from django.db.models import Avg
+
 from .models import Product, Comment, Like
+
+from .models import Product, Comment, Favorites
+
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        exclude = ('password',)
+
+    def to_representation(self, instance):
+        repr = super().to_representation(instance)
+        repr['favorites'] = FavoritesSerializer(instance.favorites.all(), many=True).data
+        return repr
+
+class FavoritesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Favorites
+        fields = ('product',)
+
+    def to_representation(self, instance):
+        repr = super().to_representation(instance)
+        repr['product'] = ProductListSerializer(instance.post).data
+        return repr
+    
 class ProductListSerializer(serializers.ModelSerializer):
     
     class Meta:

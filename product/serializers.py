@@ -1,6 +1,6 @@
 from rest_framework import serializers 
 from django.db.models import Avg
-from .models import Product, Comment
+from .models import Product, Comment, Like
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -38,3 +38,23 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ('id', 'body', 'owner', 'product')
+    def is_liked(self, product):
+        user = self.context.get('request').user
+        return user.liked.filter(product=product).exists()
+
+    def to_representation(self, instance):
+        repr = super().to_representation(instance)
+        # repr['comments'] = CommentSerializer(instance.comments.all(), many=True).data
+        user = self.context.get('request').user
+        if user.is_authenticated:
+            repr['is_liked'] = self.is_liked(instance)
+        repr['likes_count'] = instance.likes.count()
+        return repr
+
+
+
+class LikeSerializer(serializers.ModelSerializer):
+    owner = serializers.ReadOnlyField(source='owner.email')
+    class Meta:
+        model = Like
+        fields = ('owner',)

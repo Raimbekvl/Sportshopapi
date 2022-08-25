@@ -42,6 +42,32 @@ class ProductViewSet(ModelViewSet):
             comments = post.related_name.all()
             serializer = serializers.CommentSerializer(comments, many=True)
             return Response(serializers.data, status=200)
+     #api/v1/posts/<id>/add_to_liked/
+    @action(['POST'], detail=True)
+    def add_to_liked(self, request, pk):
+        product = self.get_object()
+        if request.user.liked.filter(product=product).exists():
+            return Response('Вы уже поставили лайк', status=400)
+        Like.objects.create(product=product, user=request.user)
+        return Response('Вы поставили  лайк!', status=201)
+
+    # api/v1/posts/<id>/remove_from_liked/
+    @action(['POST'], detail=True)
+    
+    def remove_from_liked(self, request, pk):
+        product = self.get_object()
+        if not request.user.liked.filter(product=product).exists():
+            return Response('Вы не лайкали пост !' , status=400)
+        request.user.liked.filter(product=product).delete()
+        return Response('Ваш лайк удален!', status=204)
+
+    #api/v1/posts/<id>/get_likes/
+    @action(['GET'],detail=True)
+    def get_likes(self, request, pk):
+        product = self.get_object()
+        likes = product.likes.all()
+        serializer = serializers.LikeSerializer(likes, many=True)
+        return Response(serializer.data, status=200)
 
 class CommentListCreateView(generics.ListCreateAPIView):
     queryset = Comment.objects.all()

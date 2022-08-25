@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model, authenticate
 from django.utils.translation import gettext_lazy as _
 
 
+
 User = get_user_model()
 
 
@@ -88,3 +89,4 @@ class RestorePasswordSerializer(serializers.Serializer):
         user.activation_code = ''
         user.save()
         return user
+

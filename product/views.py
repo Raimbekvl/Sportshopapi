@@ -1,5 +1,5 @@
 from rest_framework.viewsets import ModelViewSet 
-from rest_framework import permissions, response
+from rest_framework import permissions, response, generics
 from rest_framework.decorators import action 
 from rating.serializers import ReviewSerializer
 from .import serializers
@@ -7,6 +7,8 @@ from .models import Product
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
+from .import serializers
+from .models import Product, Comment
 
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all()
@@ -33,3 +35,24 @@ class ProductViewSet(ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return response.Response(serializer.data, status=201) 
+    
+    @action(['GET'], detail=True)
+    def comments(self, request, pk):
+            post = self.get_object()
+            comments = post.related_name.all()
+            serializer = serializers.CommentSerializer(comments, many=True)
+            return Response(serializers.data, status=200)
+
+class CommentListCreateView(generics.ListCreateAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = serializers.CommentSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+
+class CommentDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = serializers.CommentSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)

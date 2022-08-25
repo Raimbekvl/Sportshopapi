@@ -25,3 +25,10 @@ class Comment(models.Model):
 
     def __str__(self) -> str:
         return f'{self.owner} -> {self.product} -> {self.created_at}'
+
+class Favorites(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='favorites')
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='favorites')
+
+    class Meta:
+        unique_together = ['product', 'owner']

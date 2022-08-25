@@ -43,6 +43,14 @@ class ProductViewSet(ModelViewSet):
             comments = post.related_name.all()
             serializer = serializers.CommentSerializer(comments, many=True)
             return Response(serializers.data, status=200)
+    @action(['POST'], detail=True)
+    def favorite_action(self, request, pk):
+        post = self.get_object()
+        if request.user.favorites.filter(post=post).exists():
+            request.user.favorites.filter(post=post).delete()
+            return Response('Removed from Favorites', status=204)
+        Favorites.objects.create(post=post, owner=request.user)
+        return Response('Added to favorites!', status=201)
 
 class CommentListCreateView(generics.ListCreateAPIView):
     queryset = Comment.objects.all()

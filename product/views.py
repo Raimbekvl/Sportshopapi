@@ -69,7 +69,7 @@ class ProductViewSet(ModelViewSet):
         serializer = serializers.LikeSerializer(likes, many=True)
         return Response(serializer.data, status=200)
 
-class CommentListCreateView(generics.ListCreateAPIView):
+class CommentListCreateVieiw(generics.ListCreateAPIView):
     queryset = Comment.objects.all()
     serializer_class = serializers.CommentSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)

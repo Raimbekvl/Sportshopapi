@@ -3,7 +3,7 @@ from rest_framework import permissions, response, generics
 from rest_framework.decorators import action 
 from rating.serializers import ReviewSerializer
 from .import serializers
-from .models import Product
+from .models import Product, Like
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from rest_framework.response import Response

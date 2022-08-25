@@ -23,4 +23,3 @@ class Review(models.Model):
     text = models.TextField()
     rating = models.IntegerField(choices=Mark.marks)
     create_at = models.DateTimeField(auto_now_add=True)
-    

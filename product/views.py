@@ -6,7 +6,7 @@ from .import serializers
 from .models import Product
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
-
+from rest_framework.response import Response
 
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all()
@@ -33,5 +33,3 @@ class ProductViewSet(ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return response.Response(serializer.data, status=201) 
-
-    

@@ -1,6 +1,8 @@
 from django.db import models
 from category.models import Category
+# from sportshopAPI import settings
 
+# User = settings.AUTH_USER_MODEL
 
 class Product(models.Model):
     title = models.CharField(max_length=100)

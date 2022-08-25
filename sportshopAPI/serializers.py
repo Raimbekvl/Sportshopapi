@@ -16,4 +16,3 @@ class ReviewSerializer(serializers.ModelSerializer):
         validated_data['user'] = user 
         validated_data['product'] = product 
         return super().create(validated_data)
-           

@@ -14,14 +14,11 @@ from rest_framework.pagination import PageNumberPagination
 
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all()
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly,]
-    filter_backends = (DjangoFilterBackend, SearchFilter)
-    filterset_fields = ('category',)
-    search_fields = ('title',)
+    
 
 
 class StandartResultsPagination(PageNumberPagination):
-    page_size = 5
+    page_size = 2
     page_query_param = 'page'
     max_page_size = 1000
 
@@ -30,6 +27,9 @@ class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all()
     permission_classes = [permissions.IsAuthenticatedOrReadOnly,]
     pagination_class = StandartResultsPagination
+    filter_backends = (DjangoFilterBackend, SearchFilter)
+    filterset_fields = ('category',)
+    search_fields = ('title',)
 
 
     def get_serializer_class(self):

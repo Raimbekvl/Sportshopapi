@@ -16,13 +16,22 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include, re_path
 from rest_framework.routers import SimpleRouter
-from product.views import ProductViewSet
+from product import views
+from product.views import ProductViewSet, home
 from django.conf.urls.static import static
 from django.conf import settings
 from cart.views import CartApiView
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
+from product import views
+
+from django.conf.urls import url
+from django.contrib import admin
+from django.conf import settings
+from django.conf.urls.static import static
+
+
 
 router = SimpleRouter()
 router.register('products', ProductViewSet)
@@ -49,7 +58,16 @@ urlpatterns = [
     path('api/v1/account/', include('account.urls')),
     path('api/v1/product/', include('product.urls')),
     path('api/v1/cart/', CartApiView.as_view()),
-    path('api/v1/orders/', include('order.urls'))
-]
+    path('api/v1/orders/', include('order.urls')),
+    url(r'^$', views.home, name='product.urls'),
+    url(r'^uploads/simple/$', views.simple_upload, name='simple_upload'),
+    url(r'^uploads/form/$', views.model_form_upload, name='model_form_upload'),
 
+]
+# urlpatterns = [
+#     url(r'^$', views.home, name='home'),
+#     url(r'^uploads/simple/$', views.simple_upload, name='simple_upload'),
+#     url(r'^uploads/form/$', views.model_form_upload, name='model_form_upload'),
+#     url(r'^admin/', admin.site.urls),
+# ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

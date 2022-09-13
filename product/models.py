@@ -1,5 +1,8 @@
 from django.db import models
 from category.models import Category
+# from __future__ import unicode_literals
+
+from django.db import models
 
 # from sportshopAPI import settings
 
@@ -16,6 +19,9 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     category = models.ForeignKey(Category, on_delete = models.CASCADE, related_name='products')
     image = models.ImageField(upload_to='images', null=True, blank=True)
+    document = models.FileField(upload_to='documents/')
+
+
 
     class Meta:
         ordering = ['title']
@@ -47,3 +53,10 @@ class Favorites(models.Model):
     class Meta:
         unique_together = ['product', 'owner']
 
+
+
+
+class Document(models.Model):
+    description = models.CharField(max_length=255, blank=True)
+    document = models.FileField(upload_to='documents/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)

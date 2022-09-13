@@ -8,8 +8,14 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
 from .import serializers
-from .models import Product, Comment
+from .models import Product, Comment, Document
 from rest_framework.pagination import PageNumberPagination
+from django.shortcuts import render, redirect
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+
+# from product.models import Document
+from product.forms import DocumentForm
 
 
 class ProductViewSet(ModelViewSet):
@@ -32,12 +38,13 @@ class ProductViewSet(ModelViewSet):
     search_fields = ('title',)
 
 
+
     def get_serializer_class(self):
         if self.action =='list':
             return serializers.ProductListSerializer
         return serializers.ProductDetailSerializer
     
-
+    
     #api/v1/products/<id>/reviews/
     @action(['GET', 'POST'], detail=True)
     def reviews(self, request, pk=None):
@@ -51,6 +58,7 @@ class ProductViewSet(ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return response.Response(serializer.data, status=201) 
+    
     
     @action(['GET'], detail=True)
     def comments(self, request, pk):
@@ -112,3 +120,32 @@ class CommentDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Comment.objects.all()
     serializer_class = serializers.CommentSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+def home(request):
+    documents = Document.objects.all()
+    return render(request, 'templates/home.html', { 'documents': documents })
+
+
+def simple_upload(request):
+    if request.method == 'POST' and request.FILES['myfile']:
+        myfile = request.FILES['myfile']
+        fs = FileSystemStorage()
+        filename = fs.save(myfile.name, myfile)
+        uploaded_file_url = fs.url(filename)
+        return render(request, 'core/simple_upload.html', {
+            'uploaded_file_url': uploaded_file_url
+        })
+    return render(request, 'core/simple_upload.html')
+
+
+def model_form_upload(request):
+    if request.method == 'POST':
+        form = DocumentForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('home')
+    else:
+        form = DocumentForm()
+    return render(request, 'core/model_form_upload.html', {
+        'form': form
+    })
